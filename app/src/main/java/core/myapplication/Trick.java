@@ -2,7 +2,7 @@ package core.myapplication;
 
 import android.net.Uri;
 
-import java.lang.reflect.Array;
+import java.util.List;
 
 /**
  * Created by A.Barredo on 14/12/2015.
@@ -10,5 +10,13 @@ import java.lang.reflect.Array;
  */
 public class Trick {
     Uri videofile;
-    Array Imu[][];
+    List<String> data;
+
+    public Trick(Uri videofile, List<String> data) {
+        this.videofile = videofile;
+        this.data = data;
+    }
+    public Trick( List<String> data) {
+        this.data = data;
+    }
 }
