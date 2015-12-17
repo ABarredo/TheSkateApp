@@ -42,6 +42,7 @@ public class NavigationDrawerFragment extends Fragment {
     private View fragmentContainerView;
 
     private SkateAdapter skateAdapter;
+    private String TAG = "Abarredo.NavigationDrawerFragment";
     public NavigationDrawerFragment() {
         // Required empty public constructor
     }
@@ -117,7 +118,7 @@ public class NavigationDrawerFragment extends Fragment {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                Log.d("ABARREDO", "Drawer Opened");
+                Log.d(TAG, "Drawer Opened");
                 if(!mUserLearnedDrawer){
                     mUserLearnedDrawer=true;
                     saveToSharedPreferences(getActivity(),KEY_USER_LEARNED_DRAWER,mUserLearnedDrawer+"");
@@ -170,15 +171,16 @@ public class NavigationDrawerFragment extends Fragment {
 
     }*/
     static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener{
+        private String TAG = "Abarredo.RecyclerTouchListener";
         private GestureDetector gestureDetector;
         private ClickListener clikListener;
         public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener){
             this.clikListener = clickListener;
-            Log.d("ABARREDO", "Constructor invoked");
+            Log.d(TAG, "Constructor invoked");
             gestureDetector = new GestureDetector(context,new GestureDetector.SimpleOnGestureListener(){
                 @Override
                 public boolean onSingleTapUp(MotionEvent e) {
-                    Log.d("ABARREDO", "Tap");
+                    Log.d(TAG, "Tap");
                     return true;
 
                 }
@@ -189,7 +191,7 @@ public class NavigationDrawerFragment extends Fragment {
                     View child = recyclerView.findChildViewUnder(e.getX(),e.getY());
                     if(child!= null && clickListener!= null) {
                         clickListener.onLongClick(child,recyclerView.getChildPosition(child));
-                        Log.d("ABARREDO", "Long Press");
+                        Log.d(TAG, "Long Press");
                     }
                 }
             });
@@ -202,14 +204,14 @@ public class NavigationDrawerFragment extends Fragment {
             if(child!=null && clikListener!=null && gestureDetector.onTouchEvent(e)){
                 clikListener.onClick(child,rv.getChildPosition(child));
             }
-            Log.d("ABARREDO", "On intercept touch event");
+            Log.d(TAG, "On intercept touch event");
 
             return false;
         }
 
         @Override
         public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-            Log.d("ABARREDO", "On touch event");
+            Log.d(TAG, "On touch event");
 
         }
 

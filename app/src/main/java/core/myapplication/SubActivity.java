@@ -4,11 +4,14 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class SubActivity extends ActionBarActivity {
+    private Trick trick;
+    private String TAG = "AbarredoSubActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +21,12 @@ public class SubActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Bundle b = this.getIntent().getExtras();
+        if (b != null) {
+            trick = b.getParcelable(Constants.TRICK_PASSED);
+            Log.d(TAG, "Object Passed");
+        }
+
     }
 
 
@@ -39,7 +48,7 @@ public class SubActivity extends ActionBarActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-        if (id == android.R.id.home){
+        if (id == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
         }
         return super.onOptionsItemSelected(item);

@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
     private Toolbar toolbar;
+    private String TAG = "Abarredo.MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
         }
         if(id == R.id.navigate){
             startActivity(new Intent(this,SubActivity.class));
-            Log.d("ABARREDO", "Navigating");
+            Log.d(TAG, "Navigating");
         }
         return super.onOptionsItemSelected(item);
     }

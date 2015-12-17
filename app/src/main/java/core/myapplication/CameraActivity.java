@@ -50,16 +50,19 @@ public class CameraActivity extends ActionBarActivity {
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     private String readMessage;
-    private static final String TAG = "BluetoothChatFragment";
     private String mConnectedDeviceName = null;
     private List<String> mData;
     private Trick mTrick;
+    private String TAG = "Abarredo.CameraActivity";
+    private Uri uri;
+    private static DataSaver dataSaver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        Log.d("ABARREDO", "onCreate");
+        Log.d(TAG, "onCreate");
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -77,7 +80,7 @@ public class CameraActivity extends ActionBarActivity {
 
                     } else {
                         if (mBluetooth.getState() == Bluetooth.STATE_CONNECTED) {
-                            Log.d("ABARREDO", "started recording");
+                            Log.d(TAG, "started recording");
                             Toast.makeText(getApplicationContext(), "Started recording ", Toast.LENGTH_SHORT).show();
                             isRecording = true;
                             mediaRecorder = new MediaRecorder();
@@ -86,7 +89,9 @@ public class CameraActivity extends ActionBarActivity {
                             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
                             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
                             mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-                            mediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
+                            File file = DataSaver.getOutputMediaFile(MEDIA_TYPE_VIDEO,"THE SKATE APP");
+                            uri = DataSaver.getOutputMediaFileUri(file);
+                            mediaRecorder.setOutputFile(file.toString());
                             mediaRecorder.setPreviewDisplay(null);
                             try {
                                 mediaRecorder.prepare();
@@ -102,9 +107,15 @@ public class CameraActivity extends ActionBarActivity {
                                     releaseMediaRecorder();
                                     isRecording = false;
                                     Toast.makeText(getApplicationContext(), "Finished recording ", Toast.LENGTH_SHORT).show();
-                                    Log.d("ABARREDO", "finished recording");
-                                    Log.d("ABARREDO", mData.size()+"");
-                                    mTrick = new Trick(mData);
+                                    Log.d(TAG, "finished recording");
+                                    Log.d(TAG, mData.size()+"");
+                                    mTrick = new Trick(uri,mData);
+                                    Intent i = new Intent();
+                                    Bundle b = new Bundle();
+                                    b.putParcelable(Constants.TRICK_PASSED, mTrick);
+                                    i.putExtras(b);
+                                    i.setClass(getApplicationContext(), SubActivity.class);
+                                    startActivity(i);
                                 }
                             }, 15000);
 
@@ -124,11 +135,11 @@ public class CameraActivity extends ActionBarActivity {
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("ABARREDO", "onStart");
+        Log.d(TAG, "onStart");
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-            Log.d("ABARREDO", "Try to connect with insecure");
+            Log.d(TAG, "Try to connect with insecure");
         } else if (mBluetooth == null) {
             setup();
         }
@@ -138,7 +149,7 @@ public class CameraActivity extends ActionBarActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("ABARREDO", "onDestroy");
+        Log.d(TAG, "onDestroy");
         if (mBluetooth != null) {
             mBluetooth.stop();
         }
@@ -149,18 +160,18 @@ public class CameraActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("ABARREDO", "onResume");
+        Log.d(TAG, "onResume");
         if (mBluetooth != null) {
             // Only if the state is STATE_NONE, do we know that we haven't started already
             if (mBluetooth.getState() == Bluetooth.STATE_NONE) {
                 // Start the Bluetooth chat services
                 connectDevice(true);
                 Toast.makeText(getApplicationContext(), " Bluetooth.STATE_NONE", Toast.LENGTH_SHORT).show();
-                Log.d("ABARREDO", "Bluetooth.STATE_NONE");
+                Log.d(TAG, "Bluetooth.STATE_NONE");
             }
             if (mBluetooth.getState() == Bluetooth.STATE_CONNECTED) {
                 Toast.makeText(getApplicationContext(), " Connected onResume", Toast.LENGTH_SHORT).show();
-                Log.d("ABARREDO", "Connected onResume");
+                Log.d(TAG, "Connected onResume");
             }
         }else{
             setup();
@@ -175,7 +186,7 @@ public class CameraActivity extends ActionBarActivity {
     }
 
     public void setup() {
-        Log.d("ABARREDO", "setup");
+        Log.d(TAG, "setup");
         // Initialize the BluetoothChatService to perform bluetooth connections
         mBluetooth = new Bluetooth((Activity) this, mHandler);
 
@@ -192,7 +203,7 @@ public class CameraActivity extends ActionBarActivity {
             return;
         }
         Toast.makeText(getApplicationContext(), " Sending data", Toast.LENGTH_SHORT).show();
-        Log.d("ABARREDO", "Sending data");
+        Log.d(TAG, "Sending data");
         // Check that there's actually something to send
         if (message.length() > 0) {
             // Get the message bytes and tell the BluetoothChatService to write
@@ -274,7 +285,7 @@ public class CameraActivity extends ActionBarActivity {
 
     private void connectDevice(boolean secure) {
         Toast.makeText(getApplicationContext(), " mBluetooth.connect", Toast.LENGTH_SHORT).show();
-        Log.d("ABARREDO", "mBluetooth.connect");
+        Log.d(TAG, "mBluetooth.connect");
         // Get the device MAC address
         String address = getAddress();
         // Get the BluetoothDevice object
@@ -286,7 +297,7 @@ public class CameraActivity extends ActionBarActivity {
     }
 
     public String getAddress() {
-        Log.d("ABARREDO", "getAddress");
+        Log.d(TAG, "getAddress");
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 // If there are paired devices
         if (pairedDevices.size() > 0) {
@@ -304,7 +315,7 @@ public class CameraActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         Toast.makeText(getApplicationContext(), " onPause", Toast.LENGTH_SHORT).show();
-        Log.d("ABARREDO", "onPause");
+        Log.d(TAG, "onPause");
         releaseMediaRecorder();       // if you are using MediaRecorder, release it first
         releaseCamera();              // release the camera immediately on pause event
     }
@@ -386,7 +397,7 @@ public class CameraActivity extends ActionBarActivity {
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
-                Log.d("ABARREDO", "failed to create directory");
+                Log.d("ABARREDO.gOutMediaFile", "failed to create directory");
                 return null;
             }
         }

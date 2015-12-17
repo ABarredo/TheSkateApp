@@ -17,6 +17,7 @@ import java.io.IOException;
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    private String TAG = "Abarredo.CameraPreview";
 
     public SurfaceHolder getmHolder(){
         return mHolder;
@@ -39,7 +40,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
         } catch (IOException e) {
-            Log.d("ABARREDO", "Error setting camera preview: " + e.getMessage());
+            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
     public void surfaceDestroyed(SurfaceHolder holder) {
