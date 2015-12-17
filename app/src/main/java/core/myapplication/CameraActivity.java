@@ -188,7 +188,7 @@ public class CameraActivity extends ActionBarActivity {
     public void setup() {
         Log.d(TAG, "setup");
         // Initialize the BluetoothChatService to perform bluetooth connections
-        mBluetooth = new Bluetooth((Activity) this, mHandler);
+        mBluetooth = new Bluetooth((Activity) this, mHandler,mTrick);
 
         // Initialize the buffer for outgoing messages
         mOutStringBuffer = new StringBuffer("");
@@ -266,9 +266,9 @@ public class CameraActivity extends ActionBarActivity {
                     String writeMessage = new String(writeBuf);
                     break;
                 case Constants.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
+                    readMessage= (String) msg.obj;
                     // construct a string from the valid bytes in the buffer
-                    readMessage = new String(readBuf, 0, msg.arg1);
+                    //readMessage = new String(readBuf, 0, msg.arg1);
                     mData.add(readMessage);
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:

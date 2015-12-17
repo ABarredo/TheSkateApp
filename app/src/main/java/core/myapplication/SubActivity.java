@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.List;
+
 
 public class SubActivity extends ActionBarActivity {
     private Trick trick;
@@ -25,10 +27,18 @@ public class SubActivity extends ActionBarActivity {
         if (b != null) {
             trick = b.getParcelable(Constants.TRICK_PASSED);
             Log.d(TAG, "Object Passed");
+            showTrick(trick.getData());
         }
 
     }
+    public void showTrick(List<String> data){
+        Log.d(TAG, "Mostrando datos" + data.size());
+        /*for(int i = 0;i<data.size();i++){
+            String dataItem = data.get(i);
+            Log.d(TAG, "Dato "+i+": "+dataItem);
+        }*/
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

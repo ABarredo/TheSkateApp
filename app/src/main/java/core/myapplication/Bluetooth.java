@@ -10,9 +10,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -43,20 +46,22 @@ public class Bluetooth {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private int mState;
+    private Trick trick;
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
-
+    private List<String> data;
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public Bluetooth(Context context, Handler handler) {
+    public Bluetooth(Context context, Handler handler,Trick trick) {
+        this.trick = trick;
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
@@ -453,17 +458,34 @@ public class Bluetooth {
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
-            int bytes;
+            int begin = 0;
+            int bytes=0;
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
+                    //bytes = mmInStream.read(buffer);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(mmInStream));
+                        String line = null;
+                        while((line = reader.readLine()) != null) {
+                            Log.d(TAG,line);
+                            mHandler.obtainMessage(Constants.MESSAGE_READ,line).sendToTarget();
+                        }
+                    /*bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
+                    for(int i = begin; i < bytes; i++) {
+                        if(buffer[i] == "#".getBytes()[0]) {
+                            mHandler.obtainMessage(Constants.MESSAGE_READ, begin, i, buffer).sendToTarget();
+                            begin = i + 1;
+                            if(i == bytes - 1) {
+                                bytes = 0;
+                                begin = 0;
+                            }
+                        }
+                    }*/
 
-                    // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
+                    //mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
+                            //.sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
@@ -473,7 +495,6 @@ public class Bluetooth {
                 }
             }
         }
-
         /**
          * Write to the connected OutStream.
          *

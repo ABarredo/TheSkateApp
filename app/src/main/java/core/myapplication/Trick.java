@@ -19,6 +19,22 @@ public class Trick implements Parcelable {
         this.data = data;
     }
 
+    public void setVideofile(Uri videofile) {
+        this.videofile = videofile;
+    }
+
+    public void setData(List<String> data) {
+        this.data = data;
+    }
+
+    public List<String> getData() {
+        return data;
+    }
+
+    public Uri getVideofile() {
+        return videofile;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -45,4 +61,5 @@ public class Trick implements Parcelable {
             return new Trick[size];
         }
     };
+
 }

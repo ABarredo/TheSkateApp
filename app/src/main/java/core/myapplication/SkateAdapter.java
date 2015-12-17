@@ -26,13 +26,6 @@ public class SkateAdapter extends RecyclerView.Adapter<SkateAdapter.MyViewHolder
         this.items = items;
         inflater = LayoutInflater.from(context);
     }
-    /*public void delete(int position){
-        items.remove(position);
-        notifyItemRemoved(position);
-    }*/
-    /*public void setClickListener(ClickListener clickListener){
-        this.clickListener=clickListener;
-    }*/
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.recycler_row,parent,false);
@@ -60,18 +53,7 @@ public class SkateAdapter extends RecyclerView.Adapter<SkateAdapter.MyViewHolder
             icon = (ImageView) itemView.findViewById(R.id.recyclerIcon);
             //itemView.setOnClickListener(this);
         }
-        /*
-        @Override
-        public void onClick(View v) {
-            //Toast.makeText(context,"Item clicked at "+getPosition(),Toast.LENGTH_SHORT).show();
-            //delete(getPosition());
-            context.startActivity(new Intent(context,SubActivity.class));
-            if(clickListener != null){
-                clickListener.itemClicked(v,getPosition());
-            }
-        }*/
+
     }
-    /*public interface ClickListener{
-        public void itemClicked(View view,int position);
-    }*/
+
 }
