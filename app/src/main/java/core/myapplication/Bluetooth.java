@@ -469,7 +469,6 @@ public class Bluetooth {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(mmInStream));
                         String line = null;
                         while((line = reader.readLine()) != null) {
-                            Log.d(TAG,line);
                             mHandler.obtainMessage(Constants.MESSAGE_READ,line).sendToTarget();
                         }
                     /*bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);

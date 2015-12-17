@@ -35,6 +35,7 @@ import java.util.Set;
 
 
 public class CameraActivity extends ActionBarActivity {
+    private int contadorClaseData = 1;
     private boolean isRecording = false;
     private Camera camera;
     private CameraPreview preview;
@@ -51,7 +52,10 @@ public class CameraActivity extends ActionBarActivity {
     public static final int MEDIA_TYPE_VIDEO = 2;
     private String readMessage;
     private String mConnectedDeviceName = null;
-    private List<String> mData;
+    private List<String> mDataRoll;
+    private List<String> mDataPitch;
+    private List<String> mDataYaw;
+    private List<String> mDataAltitude;
     private Trick mTrick;
     private String TAG = "Abarredo.CameraActivity";
     private Uri uri;
@@ -108,8 +112,8 @@ public class CameraActivity extends ActionBarActivity {
                                     isRecording = false;
                                     Toast.makeText(getApplicationContext(), "Finished recording ", Toast.LENGTH_SHORT).show();
                                     Log.d(TAG, "finished recording");
-                                    Log.d(TAG, mData.size()+"");
-                                    mTrick = new Trick(uri,mData);
+                                    Log.d(TAG, mDataRoll.size()+"");
+                                    mTrick = new Trick(uri,mDataRoll,mDataPitch,mDataYaw,mDataAltitude);
                                     Intent i = new Intent();
                                     Bundle b = new Bundle();
                                     b.putParcelable(Constants.TRICK_PASSED, mTrick);
@@ -192,7 +196,10 @@ public class CameraActivity extends ActionBarActivity {
 
         // Initialize the buffer for outgoing messages
         mOutStringBuffer = new StringBuffer("");
-        mData = new ArrayList<String>();
+        mDataRoll = new ArrayList<String>();
+        mDataPitch = new ArrayList<String>();
+        mDataYaw = new ArrayList<String>();
+        mDataAltitude = new ArrayList<String>();
     }
 
 
@@ -267,9 +274,25 @@ public class CameraActivity extends ActionBarActivity {
                     break;
                 case Constants.MESSAGE_READ:
                     readMessage= (String) msg.obj;
-                    // construct a string from the valid bytes in the buffer
-                    //readMessage = new String(readBuf, 0, msg.arg1);
-                    mData.add(readMessage);
+                    switch (contadorClaseData){
+                        case 1:
+                            mDataRoll.add(readMessage);
+                            break;
+                        case 2:
+                            mDataPitch.add(readMessage);
+                            break;
+                        case 3:
+                            mDataYaw.add(readMessage);
+                            break;
+                        case 4:
+                            mDataAltitude.add(readMessage);
+                            break;
+                    }
+                    contadorClaseData++;
+                    if(contadorClaseData == 5) {
+                        contadorClaseData = 1;
+                    }
+
                     break;
                 case Constants.MESSAGE_DEVICE_NAME:
                     // save the connected device's name

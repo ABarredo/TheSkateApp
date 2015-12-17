@@ -27,16 +27,16 @@ public class SubActivity extends ActionBarActivity {
         if (b != null) {
             trick = b.getParcelable(Constants.TRICK_PASSED);
             Log.d(TAG, "Object Passed");
-            showTrick(trick.getData());
+            showTrick(trick.getDataPitch());
         }
 
     }
     public void showTrick(List<String> data){
         Log.d(TAG, "Mostrando datos" + data.size());
-        /*for(int i = 0;i<data.size();i++){
+        for(int i = 0;i<data.size();i++){
             String dataItem = data.get(i);
             Log.d(TAG, "Dato "+i+": "+dataItem);
-        }*/
+        }
 
     }
 
