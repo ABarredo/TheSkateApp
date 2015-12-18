@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/card_linear_container"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_gravity="top"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_name"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                card_view:cardCornerRadius="15dp">
+
+                <ImageView
+                    android:id="@+id/card_name_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:rotation="-45"/>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="6dp"
+                card_view:cardCornerRadius="15dp">
+                <VideoView
+                    android:id="@+id/card_skate_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"/>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lienar_card"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_below="@id/card_video"
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_skate"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                card_view:cardCornerRadius="15dp">
+
+                <ImageView
+                    android:id="@+id/card_skate_image"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp" />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_graph"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                card_view:cardCornerRadius="15dp"
+                >
+
+                <ImageView
+                    android:id="@+id/card_graph_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:cropToPadding="true"/>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

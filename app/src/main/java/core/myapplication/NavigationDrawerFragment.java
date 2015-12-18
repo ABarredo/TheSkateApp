@@ -41,7 +41,7 @@ public class NavigationDrawerFragment extends Fragment {
 
     private View fragmentContainerView;
 
-    private SkateAdapter skateAdapter;
+    private NavDrawerAdapter navDrawerAdapter;
     private String TAG = "Abarredo.NavigationDrawerFragment";
     public NavigationDrawerFragment() {
         // Required empty public constructor
@@ -58,16 +58,16 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawer_list);
 
-        skateAdapter = new SkateAdapter(getActivity(),getData());
+        navDrawerAdapter = new NavDrawerAdapter(getActivity(),getData());
         //skateAdapter.setClickListener(this);
 
-        recyclerView.setAdapter(skateAdapter);
+        recyclerView.setAdapter(navDrawerAdapter);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -78,7 +78,12 @@ public class NavigationDrawerFragment extends Fragment {
                     case 0:
                         break;
                     case 1:
-                        startActivity(new Intent(getActivity(),SubActivity.class));
+                        Intent intent = new Intent();
+                        Bundle b = new Bundle();
+                        b.putParcelable(Constants.NO_BLUETOOTH, null);
+                        intent.putExtras(b);
+                        intent.setClass(getActivity(), SubActivity.class);
+                        startActivity(intent);
                         break;
                     case 2:
                         startActivity(new Intent(getActivity(),CameraActivity.class));

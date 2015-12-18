@@ -15,13 +15,13 @@ import java.util.List;
  * Created by A.Barredo on 02/12/2015.
  * Student of Deusto University
  */
-public class SkateAdapter extends RecyclerView.Adapter<SkateAdapter.MyViewHolder> {
+public class NavDrawerAdapter extends RecyclerView.Adapter<NavDrawerAdapter.MyViewHolder> {
     private LayoutInflater inflater;
     //private ClickListener clickListener;
     Context context;
     List<DrawerItems> items = Collections.emptyList();
 
-    public SkateAdapter(Context context,List<DrawerItems> items){
+    public NavDrawerAdapter(Context context, List<DrawerItems> items){
         this.context = context;
         this.items = items;
         inflater = LayoutInflater.from(context);

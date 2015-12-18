@@ -50,6 +50,7 @@ public class CameraActivity extends ActionBarActivity {
     private Bluetooth mBluetooth = null;
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
+    public static final int MEDIA_TYPE_DATA = 3;
     private String readMessage;
     private String mConnectedDeviceName = null;
     private List<String> mDataRoll;
@@ -93,7 +94,8 @@ public class CameraActivity extends ActionBarActivity {
                             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
                             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
                             mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
-                            File file = DataSaver.getOutputMediaFile(MEDIA_TYPE_VIDEO,"THE SKATE APP");
+                            final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                            File file = DataSaver.getOutputMediaFile(MEDIA_TYPE_VIDEO,"THE SKATE APP",null,timeStamp,getApplicationContext());
                             uri = DataSaver.getOutputMediaFileUri(file);
                             mediaRecorder.setOutputFile(file.toString());
                             mediaRecorder.setPreviewDisplay(null);
@@ -112,8 +114,16 @@ public class CameraActivity extends ActionBarActivity {
                                     isRecording = false;
                                     Toast.makeText(getApplicationContext(), "Finished recording ", Toast.LENGTH_SHORT).show();
                                     Log.d(TAG, "finished recording");
-                                    Log.d(TAG, mDataRoll.size()+"");
                                     mTrick = new Trick(uri,mDataRoll,mDataPitch,mDataYaw,mDataAltitude);
+                                    File fileRoll = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataRoll",timeStamp,getApplicationContext());
+                                    File filePitch = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataPitch",timeStamp,getApplicationContext());
+                                    File fileYaw = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataYaw",timeStamp,getApplicationContext());
+                                    File fileAltitude = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataAltitude",timeStamp,getApplicationContext());
+                                    if(DataSaver.saveData(fileRoll,mTrick.getDataRoll())) Log.d(TAG, "DataRollSaved");
+                                    if(DataSaver.saveData(filePitch,mTrick.getDataPitch()))Log.d(TAG, "DataPitchaved");
+                                    if(DataSaver.saveData(fileYaw,mTrick.getDataYaw()))Log.d(TAG, "DataYawSaved");
+                                    if(DataSaver.saveData(fileAltitude,mTrick.getDataAltitude()))Log.d(TAG, "DataAltitudeSaved");
+
                                     Intent i = new Intent();
                                     Bundle b = new Bundle();
                                     b.putParcelable(Constants.TRICK_PASSED, mTrick);
@@ -123,6 +133,13 @@ public class CameraActivity extends ActionBarActivity {
                                 }
                             }, 15000);
 
+                        }else{
+                            Intent i = new Intent();
+                            Bundle b = new Bundle();
+                            b.putParcelable(Constants.NO_BLUETOOTH, null);
+                            i.putExtras(b);
+                            i.setClass(getApplicationContext(), SubActivity.class);
+                            startActivity(i);
                         }
                     }
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {

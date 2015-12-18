@@ -15,10 +15,28 @@ public class Trick implements Parcelable {
     private Uri videofile;
     private Uri skateBoardPhoto;
     private Uri skateBoardGripTape;
+    private Uri graph;
     private List<String> dataRoll;
     private List<String> dataPitch;
     private List<String> dataYaw;
     private List<String> dataAltitude;
+
+    public Trick(Uri videofile, Uri skateBoardPhoto, Uri graph) {
+        this.videofile = videofile;
+        this.skateBoardPhoto = skateBoardPhoto;
+        this.skateBoardGripTape = skateBoardGripTape;
+        this.graph = graph;
+    }
+
+    public Uri getGraph() {
+        return graph;
+    }
+
+    public void setGraph(Uri graph) {
+        this.graph = graph;
+    }
+
+
 
     public Uri getSkateBoardPhoto() {
         return skateBoardPhoto;
@@ -108,6 +126,7 @@ public class Trick implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.skateBoardPhoto, 0);
         dest.writeParcelable(this.skateBoardGripTape, 0);
+        dest.writeParcelable(this.graph, 0);
         dest.writeParcelable(this.videofile, 0);
         dest.writeStringList(this.dataRoll);
         dest.writeStringList(this.dataPitch);
@@ -117,6 +136,7 @@ public class Trick implements Parcelable {
 
     private Trick(Parcel in) {
         this.videofile = in.readParcelable(Uri.class.getClassLoader());
+        this.graph = in.readParcelable(Uri.class.getClassLoader());
         this.skateBoardPhoto = in.readParcelable(Uri.class.getClassLoader());
         this.skateBoardGripTape = in.readParcelable(Uri.class.getClassLoader());
         this.dataRoll = new ArrayList<String>();

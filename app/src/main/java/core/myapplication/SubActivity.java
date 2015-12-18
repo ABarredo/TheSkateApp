@@ -1,19 +1,21 @@
 package core.myapplication;
 
+import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import java.util.List;
+import android.widget.Toast;
 
 
 public class SubActivity extends ActionBarActivity {
     private Trick trick;
     private String TAG = "AbarredoSubActivity";
+    private RecyclerView recyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,22 +25,45 @@ public class SubActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Bundle b = this.getIntent().getExtras();
-        if (b != null) {
-            trick = b.getParcelable(Constants.TRICK_PASSED);
-            Log.d(TAG, "Object Passed");
-            showTrick(trick.getDataPitch());
+        if (findViewById(R.id.fragment_container) != null) {
+
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState != null) {
+                return;
+            }
+
+            // Create a new Fragment to be placed in the activity layout
+            SubActivityFragment firstFragment = new SubActivityFragment();
+
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            firstFragment.setArguments(getIntent().getExtras());
+
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_container, firstFragment).commit();
+            if (this.getIntent().hasExtra(Constants.NO_BLUETOOTH)) {
+                Toast.makeText(getApplicationContext(), "No Bluetooth device", Toast.LENGTH_SHORT).show();
+
+
+            } else {
+                Bundle b = this.getIntent().getExtras();
+                if (b != null) {
+                    trick = b.getParcelable(Constants.TRICK_PASSED);
+                    Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Object Passed");
+                }
+
+
+            }
         }
 
-    }
-    public void showTrick(List<String> data){
-        Log.d(TAG, "Mostrando datos" + data.size());
-        for(int i = 0;i<data.size();i++){
-            String dataItem = data.get(i);
-            Log.d(TAG, "Dato "+i+": "+dataItem);
-        }
+
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -63,4 +88,5 @@ public class SubActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
