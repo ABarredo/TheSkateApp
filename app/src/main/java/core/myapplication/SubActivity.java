@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 
 public class SubActivity extends ActionBarActivity {
-    private Trick trick;
+    private Trick trick = null;
     private String TAG = "AbarredoSubActivity";
     private RecyclerView recyclerView;
 
@@ -26,27 +26,16 @@ public class SubActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         if (findViewById(R.id.fragment_container) != null) {
-
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
             if (savedInstanceState != null) {
                 return;
             }
 
-            // Create a new Fragment to be placed in the activity layout
-            SubActivityFragment firstFragment = new SubActivityFragment();
-
-            // In case this activity was started with special instructions from an
-            // Intent, pass the Intent's extras to the fragment as arguments
-            firstFragment.setArguments(getIntent().getExtras());
-
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, firstFragment).commit();
             if (this.getIntent().hasExtra(Constants.NO_BLUETOOTH)) {
                 Toast.makeText(getApplicationContext(), "No Bluetooth device", Toast.LENGTH_SHORT).show();
-
+                SubActivityFragment firstFragment = new SubActivityFragment();
+                firstFragment.setArguments(getIntent().getExtras());
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container, firstFragment).commit();
 
             } else {
                 Bundle b = this.getIntent().getExtras();
@@ -54,6 +43,10 @@ public class SubActivity extends ActionBarActivity {
                     trick = b.getParcelable(Constants.TRICK_PASSED);
                     Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Object Passed");
+                    SubActivityFragment firstFragment = new SubActivityFragment();
+                    firstFragment.setArguments(getIntent().getExtras());
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.fragment_container, firstFragment).commit();
                 }
 
 
