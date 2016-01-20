@@ -22,6 +22,7 @@ public class DataSaver {
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
     public static final int MEDIA_TYPE_DATA = 3;
+    public static final int MEDIA_TYPE_USER = 4;
     private static String TAG = "Abarredo.DataSaver";
     private static FileOutputStream out = null;
     private static BufferedWriter buf = null;
@@ -100,7 +101,11 @@ public class DataSaver {
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
                     "DAT_" + FileName + ".txt");
             MediaScannerConnection.scanFile(context, new String[]{mediaFile.getPath().toString()}, null, null);
-        } else {
+        } else if (type == MEDIA_TYPE_USER) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                     FileName);
+            MediaScannerConnection.scanFile(context, new String[]{mediaFile.getPath().toString()}, null, null);
+        }else{
             return null;
         }
 

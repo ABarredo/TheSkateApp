@@ -1,6 +1,9 @@
 package core.myapplication;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +13,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.util.EntityUtils;
+
+import java.io.File;
 
 public class SubActivity extends ActionBarActivity {
     private Trick trick = null;
@@ -31,7 +47,7 @@ public class SubActivity extends ActionBarActivity {
             }
 
             if (this.getIntent().hasExtra(Constants.NO_BLUETOOTH)) {
-                Toast.makeText(getApplicationContext(), "No Bluetooth device", Toast.LENGTH_SHORT).show();
+                //Toast..makeText(getApplicationContext(), "No Bluetooth device", Toast.LENGTH_SHORT).show();
                 SubActivityFragment firstFragment = new SubActivityFragment();
                 firstFragment.setArguments(getIntent().getExtras());
                 getSupportFragmentManager().beginTransaction()
@@ -41,12 +57,15 @@ public class SubActivity extends ActionBarActivity {
                 Bundle b = this.getIntent().getExtras();
                 if (b != null) {
                     trick = b.getParcelable(Constants.TRICK_PASSED);
-                    Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Ok", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Object Passed");
                     SubActivityFragment firstFragment = new SubActivityFragment();
                     firstFragment.setArguments(getIntent().getExtras());
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.fragment_container, firstFragment).commit();
+
+                    UpLoader up = new UpLoader(getApplicationContext());
+                    up.execute(trick);
                 }
 
 
