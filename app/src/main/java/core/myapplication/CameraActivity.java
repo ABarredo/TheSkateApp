@@ -1,7 +1,6 @@
 package core.myapplication;
 
-import android.app.ActionBar;
-import android.app.Activity;
+import android.app.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -134,6 +133,7 @@ public class CameraActivity extends ActionBarActivity {
                                     i.putExtras(b);
                                     i.setClass(getApplicationContext(), SubActivity.class);
                                     startActivity(i);
+
                                 }
                             }, 3000);
 
@@ -347,7 +347,7 @@ public class CameraActivity extends ActionBarActivity {
         if (pairedDevices.size() > 0) {
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().equals("HC-06")) {
+                if (device.getName().equals("BT23")) {
                     return device.getAddress();
                 }
             }

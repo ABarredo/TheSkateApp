@@ -20,8 +20,15 @@ public class Trick implements Parcelable {
     private Uri dataPitchFile;
     private Uri dataYawFile;
     private Uri dataAltitudeFile;
+    private int level;
 
+    public int getLevel() {
+        return level;
+    }
 
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     public void setDataAltitudeFile(Uri dataAltitudeFile) {
         this.dataAltitudeFile = dataAltitudeFile;

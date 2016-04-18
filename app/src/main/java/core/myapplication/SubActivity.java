@@ -27,7 +27,10 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 
-public class SubActivity extends ActionBarActivity {
+public class SubActivity extends ActionBarActivity implements DialogFragment.dialogListener{
+
+
+
     private Trick trick = null;
     private String TAG = "AbarredoSubActivity";
     private RecyclerView recyclerView;
@@ -63,19 +66,21 @@ public class SubActivity extends ActionBarActivity {
                     firstFragment.setArguments(getIntent().getExtras());
                     getSupportFragmentManager().beginTransaction()
                             .add(R.id.fragment_container, firstFragment).commit();
+                    DialogFragment digi = new DialogFragment();
+                    digi.show(getFragmentManager(), "nivel");
+                    Log.d(TAG, String.valueOf(trick.getLevel()));
 
-                    UpLoader up = new UpLoader(getApplicationContext());
-                    up.execute(trick);
                 }
-
-
             }
         }
-
-
-
     }
-
+    @Override
+    public void onDialogItemClicked(int level) {
+        trick.setLevel(level + 1);
+        UpLoader up = new UpLoader(getApplicationContext());
+        Log.d(TAG, "Trick level "+trick.getLevel());
+        up.execute(trick);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

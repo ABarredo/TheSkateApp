@@ -33,6 +33,7 @@ public class UpLoader extends AsyncTask<Trick,Integer,Integer> {
     @Override
     protected Integer doInBackground(Trick ... trick) {
         try {
+            int level = trick[0].getLevel();
             String videoPath = trick[0].getVideoFilePath();
             String rollPath = trick[0].getDataRollFilePath();
             String pitchPath = trick[0].getDataPitchFilePath();
@@ -49,6 +50,7 @@ public class UpLoader extends AsyncTask<Trick,Integer,Integer> {
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
             entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
             entityBuilder.addTextBody("user", "demoUser");
+            entityBuilder.addTextBody("level",String.valueOf(level));
             entityBuilder.addBinaryBody("video", videoFile);
             entityBuilder.addBinaryBody("roll", rollFile);
             entityBuilder.addBinaryBody("pitch", pitchFile);
