@@ -45,7 +45,7 @@ public class UpLoader extends AsyncTask<Trick,Integer,Integer> {
             File pitchFile = new File(pitchPath);
             File yawFile = new File(yawPath);
             File altitudeFile = new File(altitudePath);
-            HttpPost post = new HttpPost("http://192.168.1.50");
+            HttpPost post = new HttpPost("http://skate.3du.es");
 
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
             entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
