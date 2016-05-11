@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="core.myapplication.SubActivity">
+    tools:context="core.TheSkateAppV2.SubActivity">
 
     <include
         android:id="@+id/app_bar"
@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/subactivity_fragment"
-        android:name="core.myapplication.SubActivityFragment"
+        android:name="core.TheSkateAppV2.SubActivityFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent" />
 </RelativeLayout>

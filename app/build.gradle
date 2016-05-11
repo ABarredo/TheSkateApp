@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "core.myapplication"
+        applicationId "core.TheSkateAppV2"
         minSdkVersion 21
         targetSdkVersion 21
         versionCode 1
