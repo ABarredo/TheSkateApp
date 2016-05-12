@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
@@ -103,6 +104,14 @@ public class CameraActivity extends ActionBarActivity {
                             isRecording = true;
                             mediaRecorder = new MediaRecorder();
                             camera.unlock();
+                            Camera.Parameters parameters= camera.getParameters();
+                            if(parameters.getMaxNumFocusAreas()>0){
+                                ArrayList<Camera.Area> focusAreas = new ArrayList<Camera.Area>(1);
+                                focusAreas.add(new Camera.Area(new Rect(-1000, -1000, 1000, 0), 750));
+
+                                parameters.setFocusAreas(focusAreas);
+                                camera.setParameters(parameters);
+                            }
                             mediaRecorder.setCamera(camera);
                             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
                             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
@@ -114,6 +123,7 @@ public class CameraActivity extends ActionBarActivity {
                             mediaRecorder.setPreviewDisplay(null);
                             try {
                                 mediaRecorder.prepare();
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

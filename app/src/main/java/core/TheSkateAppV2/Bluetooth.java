@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 /**
@@ -35,7 +36,7 @@ public class Bluetooth {
     private static final UUID MY_UUID_SECURE =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     //private static final UUID MY_UUID_SECURE =
-    //      UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+      //      UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
     private static final UUID MY_UUID_INSECURE =
             UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
@@ -49,6 +50,10 @@ public class Bluetooth {
     private int mState;
     private Trick trick;
     private String line = null;
+    private String lineRoll = null;
+    private String linePitch = null;
+    private String lineYaw = null;
+    private String lineAltitude = null;
     private int cont = 0;
 
     // Constants that indicate the current connection state
@@ -57,28 +62,24 @@ public class Bluetooth {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
     private List<String> data;
-
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public Bluetooth(Context context, Handler handler, Trick trick) {
+    public Bluetooth(Context context, Handler handler,Trick trick) {
         this.trick = trick;
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
     }
-
-    public void startReading() {
+    public void startReading(){
         mConnectedThread.startRead = true;
     }
-
-    public void stopReading() {
+    public void stopReading(){
         mConnectedThread.stopRead = true;
     }
-
     /**
      * Set the current state of the chat connection
      *
@@ -218,7 +219,7 @@ public class Bluetooth {
         }
 
         if (mConnectedThread != null) {
-            Log.d(TAG, "connectedThread.cancel()");
+            Log.d(TAG,"connectedThread.cancel()");
             mConnectedThread.interrupt();
             mConnectedThread.cancel();
             mConnectedThread = null;
@@ -476,28 +477,48 @@ public class Bluetooth {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int begin = 0;
-            int bytes = 0;
+            int bytes=0;
             boolean read = false;
+            Handler handler = new Handler(Looper.getMainLooper());
 
             // Keep listening to the InputStream while connected
             while (!stopThread) {
                 if (isInterrupted()) {
                     return;
-                } else {
+                } else{
                     try {
                         // Read from the InputStream
                         //bytes = mmInStream.read(buffer);
                         BufferedReader reader = new BufferedReader(new InputStreamReader(mmInStream));
                         cont = 0;
-                        if (!stopThread && startRead && !read) {
+
+                        if(!stopThread && startRead && !read) {
                             //for (int i = 1; i <= 304; i++) {
 
-                            while (true) {
+                            while(true) {
+
                                 line = reader.readLine();
-                                mHandler.obtainMessage(Constants.MESSAGE_READ, line).sendToTarget();
-                                cont++;
-                                Log.d(TAG, "" + cont);
-                                Log.d(TAG, line);
+                                StringTokenizer st = new StringTokenizer(line,";");
+                                if(st.hasMoreElements()&& st.countTokens()==4) {
+                                    Log.d(TAG, "" + cont);
+                                    Log.d(TAG, "" + st.countTokens());
+                                    lineRoll = st.nextToken();
+                                    linePitch = st.nextToken();
+                                    lineYaw = st.nextToken();
+                                    lineAltitude = st.nextToken();
+                                }
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mHandler.obtainMessage(Constants.MESSAGE_READ, lineRoll).sendToTarget();
+                                        mHandler.obtainMessage(Constants.MESSAGE_READ, linePitch).sendToTarget();
+                                        mHandler.obtainMessage(Constants.MESSAGE_READ, lineYaw).sendToTarget();
+                                        mHandler.obtainMessage(Constants.MESSAGE_READ, lineAltitude).sendToTarget();
+                                        cont++;
+                                        Log.d(TAG, "" + cont);
+                                        //Log.d(TAG, "Roll: "+lineRoll+" Pitch: "+linePitch+" Yaw: "+lineYaw+" Alti: "+lineAltitude);
+                                    }
+                                },33);
 
 
                                 if (stopRead) {
@@ -512,7 +533,7 @@ public class Bluetooth {
 
                         }
                         //while ((line = reader.readLine()) != null) {
-                        //  mHandler.obtainMessage(Constants.MESSAGE_READ, line).sendToTarget();
+                          //  mHandler.obtainMessage(Constants.MESSAGE_READ, line).sendToTarget();
                         //}
                         //mHandler.obtainMessage(Constants.DONE_READING,true).sendToTarget();
 
@@ -538,10 +559,9 @@ public class Bluetooth {
                         Bluetooth.this.start();
                         break;
                     }
-                }
+            }
             }
         }
-
         /**
          * Write to the connected OutStream.
          *
