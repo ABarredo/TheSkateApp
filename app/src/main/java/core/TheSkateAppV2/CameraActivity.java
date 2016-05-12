@@ -64,17 +64,19 @@ public class CameraActivity extends ActionBarActivity {
     private Uri uri;
     private static DataSaver dataSaver;
     private boolean device;
+    private boolean doneReading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDevice),Context.MODE_PRIVATE);
-        device = shared.getBoolean(getString(R.string.WantDevice),false);
-        Log.d(TAG, "Device = "+ device);
+        SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDevice), Context.MODE_PRIVATE);
+        device = shared.getBoolean(getString(R.string.WantDevice), false);
+        doneReading = false;
+        Log.d(TAG, "Device = " + device);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        if(device){
+        if (device) {
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        }else{
+        } else {
             Log.d(TAG, "No Bluetooth");
         }
         Log.d(TAG, "onCreate");
@@ -90,11 +92,12 @@ public class CameraActivity extends ActionBarActivity {
         btnCapture.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     if (isRecording) {
 
                     } else {
-                        if ((device && mBluetooth.getState() == Bluetooth.STATE_CONNECTED)||(!device)) {
+                        if ((device && mBluetooth.getState() == Bluetooth.STATE_CONNECTED) || (!device)) {
                             Log.d(TAG, "started recording");
                             //Toast..makeText(getApplicationContext(), "Started recording ", Toast.LENGTH_SHORT).show();
                             isRecording = true;
@@ -105,7 +108,7 @@ public class CameraActivity extends ActionBarActivity {
                             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
                             mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
                             final String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                            File file = DataSaver.getOutputMediaFile(MEDIA_TYPE_VIDEO,"THE SKATE APP",null,timeStamp,getApplicationContext());
+                            File file = DataSaver.getOutputMediaFile(MEDIA_TYPE_VIDEO, "THE SKATE APP", null, timeStamp, getApplicationContext());
                             uri = DataSaver.getOutputMediaFileUri(file);
                             mediaRecorder.setOutputFile(file.toString());
                             mediaRecorder.setPreviewDisplay(null);
@@ -114,48 +117,60 @@ public class CameraActivity extends ActionBarActivity {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            if(device){
-                                sendMessage("S");
+                            if (device) {
+                                //sendMessage("S");
+                                mBluetooth.startReading();
                             }
                             mediaRecorder.start();
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 public void run() {
                                     mediaRecorder.stop();
+                                    mBluetooth.stopReading();
                                     releaseMediaRecorder();
                                     isRecording = false;
                                     //Toast..makeText(getApplicationContext(), "Finished recording ", Toast.LENGTH_SHORT).show();
                                     Log.d(TAG, "finished recording");
                                     //mTrick = new Trick(uri,mDataRoll,mDataPitch,mDataYaw,mDataAltitude);
-                                    File fileRoll = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataRoll",timeStamp,getApplicationContext());
-                                    File filePitch = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataPitch",timeStamp,getApplicationContext());
-                                    File fileYaw = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataYaw",timeStamp,getApplicationContext());
-                                    File fileAltitude = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA,"THE SKATE APP","DataAltitude",timeStamp,getApplicationContext());
+                                    File fileRoll = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA, "THE SKATE APP", "DataRoll", timeStamp, getApplicationContext());
+                                    File filePitch = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA, "THE SKATE APP", "DataPitch", timeStamp, getApplicationContext());
+                                    File fileYaw = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA, "THE SKATE APP", "DataYaw", timeStamp, getApplicationContext());
+                                    File fileAltitude = DataSaver.getOutputMediaFile(MEDIA_TYPE_DATA, "THE SKATE APP", "DataAltitude", timeStamp, getApplicationContext());
 
 
-                                    if(DataSaver.saveData(fileRoll,mDataRoll)) Log.d(TAG, "DataRollSaved");
-                                    if(DataSaver.saveData(filePitch,mDataPitch))Log.d(TAG, "DataPitchaved");
-                                    if(DataSaver.saveData(fileYaw,mDataYaw))Log.d(TAG, "DataYawSaved");
-                                    if(DataSaver.saveData(fileAltitude,mDataAltitude))Log.d(TAG, "DataAltitudeSaved");
-                                    mTrick = new Trick(uri,DataSaver.getOutputMediaFileUri(fileRoll),DataSaver.getOutputMediaFileUri(filePitch),DataSaver.getOutputMediaFileUri(fileYaw),DataSaver.getOutputMediaFileUri(fileAltitude));
+                                    if (DataSaver.saveData(fileRoll, mDataRoll))
+                                        Log.d(TAG, "DataRollSaved");
+                                    if (DataSaver.saveData(filePitch, mDataPitch))
+                                        Log.d(TAG, "DataPitchaved");
+                                    if (DataSaver.saveData(fileYaw, mDataYaw))
+                                        Log.d(TAG, "DataYawSaved");
+                                    if (DataSaver.saveData(fileAltitude, mDataAltitude))
+                                        Log.d(TAG, "DataAltitudeSaved");
+                                    mTrick = new Trick(uri, DataSaver.getOutputMediaFileUri(fileRoll), DataSaver.getOutputMediaFileUri(filePitch), DataSaver.getOutputMediaFileUri(fileYaw), DataSaver.getOutputMediaFileUri(fileAltitude));
 
-                                    Intent i = new Intent();
-                                    Bundle b = new Bundle();
-                                    b.putParcelable(Constants.TRICK_PASSED, mTrick);
-                                    i.putExtras(b);
-                                    i.setClass(getApplicationContext(), SubActivity.class);
-                                    startActivity(i);
+                                    //while(!doneReading);
+                                        Intent i = new Intent();
+                                        Bundle b = new Bundle();
+                                        b.putParcelable(Constants.TRICK_PASSED, mTrick);
+                                        i.putExtras(b);
+                                        i.setClass(getApplicationContext(), SubActivity.class);
+                                        //mBluetooth.stop();
+                                        startActivity(i);
+
 
                                 }
                             }, 3000);
 
-                        }else{
-                            Intent i = new Intent();
-                            Bundle b = new Bundle();
-                            b.putParcelable(Constants.NO_BLUETOOTH, null);
-                            i.putExtras(b);
-                            i.setClass(getApplicationContext(), SubActivity.class);
-                            startActivity(i);
+                        } else {
+                            while(doneReading);
+                                Log.d(TAG,"not connected");
+                                Intent i = new Intent();
+                                Bundle b = new Bundle();
+                                b.putParcelable(Constants.NO_BLUETOOTH, null);
+                                i.putExtras(b);
+                                i.setClass(getApplicationContext(), SubActivity.class);
+                                startActivity(i);
+
                         }
                     }
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -171,11 +186,11 @@ public class CameraActivity extends ActionBarActivity {
 
     @Override
     public void onStart() {
-        SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDevice),Context.MODE_PRIVATE);
-        device = shared.getBoolean(getString(R.string.WantDevice),false);
+        SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDevice), Context.MODE_PRIVATE);
+        device = shared.getBoolean(getString(R.string.WantDevice), false);
         super.onStart();
         Log.d(TAG, "onStart");
-        if(device) {
+        if (device) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
@@ -192,6 +207,7 @@ public class CameraActivity extends ActionBarActivity {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
         if (mBluetooth != null) {
+            Log.d(TAG, "mBluetooth.stop();");
             mBluetooth.stop();
         }
 
@@ -200,18 +216,19 @@ public class CameraActivity extends ActionBarActivity {
 
     @Override
     protected void onResume() {
-        SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDevice),Context.MODE_PRIVATE);
-        device = shared.getBoolean(getString(R.string.WantDevice),false);
+        SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDevice), Context.MODE_PRIVATE);
+        device = shared.getBoolean(getString(R.string.WantDevice), false);
         super.onResume();
         Log.d(TAG, "onResume");
-        if(device) {
+
+        if (device) {
             if (mBluetooth != null) {
                 // Only if the state is STATE_NONE, do we know that we haven't started already
                 if (mBluetooth.getState() == Bluetooth.STATE_NONE) {
                     // Start the Bluetooth chat services
+                    Log.d(TAG, "Bluetooth.STATE_NONE");
                     connectDevice(true);
                     //Toast..makeText(getApplicationContext(), " Bluetooth.STATE_NONE", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Bluetooth.STATE_NONE");
                 }
                 if (mBluetooth.getState() == Bluetooth.STATE_CONNECTED) {
                     //Toast..makeText(getApplicationContext(), " Connected onResume", Toast.LENGTH_SHORT).show();
@@ -233,7 +250,7 @@ public class CameraActivity extends ActionBarActivity {
     public void setup() {
         Log.d(TAG, "setup");
         // Initialize the BluetoothChatService to perform bluetooth connections
-        mBluetooth = new Bluetooth((Activity) this, mHandler,mTrick);
+        mBluetooth = new Bluetooth((Activity) this, mHandler, mTrick);
 
         // Initialize the buffer for outgoing messages
         mOutStringBuffer = new StringBuffer("");
@@ -314,8 +331,8 @@ public class CameraActivity extends ActionBarActivity {
                     String writeMessage = new String(writeBuf);
                     break;
                 case Constants.MESSAGE_READ:
-                    readMessage= (String) msg.obj;
-                    switch (contadorClaseData){
+                    readMessage = (String) msg.obj;
+                    switch (contadorClaseData) {
                         case 1:
                             mDataRoll.add(readMessage);
                             break;
@@ -330,7 +347,7 @@ public class CameraActivity extends ActionBarActivity {
                             break;
                     }
                     contadorClaseData++;
-                    if(contadorClaseData == 5) {
+                    if (contadorClaseData == 5) {
                         contadorClaseData = 1;
                     }
 
@@ -342,6 +359,10 @@ public class CameraActivity extends ActionBarActivity {
                     break;
                 case Constants.MESSAGE_TOAST:
 
+                    break;
+                case Constants.DONE_READING:
+                    Log.d(TAG,"DONE READING");
+                    doneReading = true;
                     break;
             }
         }
@@ -357,13 +378,12 @@ public class CameraActivity extends ActionBarActivity {
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
             // Attempt to connect to the device
             mBluetooth.connect(device, secure);
-        }else{
+        } else {
             Toast.makeText(CameraActivity.this, "No device found", Toast.LENGTH_SHORT).show();
             Intent i = new Intent();
             i.setClass(getApplicationContext(), SubActivity.class);
             startActivity(i);
         }
-
 
 
     }
@@ -390,6 +410,7 @@ public class CameraActivity extends ActionBarActivity {
         Log.d(TAG, "onPause");
         releaseMediaRecorder();       // if you are using MediaRecorder, release it first
         releaseCamera();              // release the camera immediately on pause event
+        //mBluetooth.stop();
     }
 
     private void releaseMediaRecorder() {

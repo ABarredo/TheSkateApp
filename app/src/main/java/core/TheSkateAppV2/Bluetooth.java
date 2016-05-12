@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
@@ -34,7 +35,7 @@ public class Bluetooth {
     private static final UUID MY_UUID_SECURE =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     //private static final UUID MY_UUID_SECURE =
-      //      UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+    //      UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
     private static final UUID MY_UUID_INSECURE =
             UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
@@ -47,6 +48,8 @@ public class Bluetooth {
     private ConnectedThread mConnectedThread;
     private int mState;
     private Trick trick;
+    private String line = null;
+    private int cont = 0;
 
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
@@ -54,17 +57,26 @@ public class Bluetooth {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
     private List<String> data;
+
     /**
      * Constructor. Prepares a new BluetoothChat session.
      *
      * @param context The UI Activity Context
      * @param handler A Handler to send messages back to the UI Activity
      */
-    public Bluetooth(Context context, Handler handler,Trick trick) {
+    public Bluetooth(Context context, Handler handler, Trick trick) {
         this.trick = trick;
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mHandler = handler;
+    }
+
+    public void startReading() {
+        mConnectedThread.startRead = true;
+    }
+
+    public void stopReading() {
+        mConnectedThread.stopRead = true;
     }
 
     /**
@@ -206,6 +218,8 @@ public class Bluetooth {
         }
 
         if (mConnectedThread != null) {
+            Log.d(TAG, "connectedThread.cancel()");
+            mConnectedThread.interrupt();
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
@@ -436,6 +450,9 @@ public class Bluetooth {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private boolean stopThread = false;
+        private boolean startRead = false;
+        private boolean stopRead = false;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
@@ -459,18 +476,47 @@ public class Bluetooth {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int begin = 0;
-            int bytes=0;
+            int bytes = 0;
+            boolean read = false;
 
             // Keep listening to the InputStream while connected
-            while (true) {
-                try {
-                    // Read from the InputStream
-                    //bytes = mmInStream.read(buffer);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(mmInStream));
-                        String line = null;
-                        while((line = reader.readLine()) != null) {
-                            mHandler.obtainMessage(Constants.MESSAGE_READ,line).sendToTarget();
+            while (!stopThread) {
+                if (isInterrupted()) {
+                    return;
+                } else {
+                    try {
+                        // Read from the InputStream
+                        //bytes = mmInStream.read(buffer);
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(mmInStream));
+                        cont = 0;
+                        if (!stopThread && startRead && !read) {
+                            //for (int i = 1; i <= 304; i++) {
+
+                            while (true) {
+                                line = reader.readLine();
+                                mHandler.obtainMessage(Constants.MESSAGE_READ, line).sendToTarget();
+                                cont++;
+                                Log.d(TAG, "" + cont);
+                                Log.d(TAG, line);
+
+
+                                if (stopRead) {
+                                    mHandler.obtainMessage(Constants.DONE_READING, true).sendToTarget();
+                                    Log.d(TAG, "DONE READING");
+                                    read = true;
+                                    reader.close();
+                                    return;
+                                }
+                            }
+                            //}
+
                         }
+                        //while ((line = reader.readLine()) != null) {
+                        //  mHandler.obtainMessage(Constants.MESSAGE_READ, line).sendToTarget();
+                        //}
+                        //mHandler.obtainMessage(Constants.DONE_READING,true).sendToTarget();
+
+
                     /*bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
                     for(int i = begin; i < bytes; i++) {
                         if(buffer[i] == "#".getBytes()[0]) {
@@ -483,17 +529,19 @@ public class Bluetooth {
                         }
                     }*/
 
-                    //mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                            //.sendToTarget();
-                } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
-                    connectionLost();
-                    // Start the service over to restart listening mode
-                    Bluetooth.this.start();
-                    break;
+                        //mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
+                        //.sendToTarget();
+                    } catch (IOException e) {
+                        Log.e(TAG, "disconnected", e);
+                        connectionLost();
+                        // Start the service over to restart listening mode
+                        Bluetooth.this.start();
+                        break;
+                    }
                 }
             }
         }
+
         /**
          * Write to the connected OutStream.
          *
@@ -512,7 +560,9 @@ public class Bluetooth {
         }
 
         public void cancel() {
+            stopThread = true;
             try {
+
                 mmSocket.close();
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);

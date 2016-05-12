@@ -28,7 +28,7 @@ public class MainActivity extends ActionBarActivity implements WantDeviceDialogF
         navigationDrawerFragment.setUp(R.id.fragment_navigation_drawer,(DrawerLayout) findViewById(R.id.drawer_layout), toolbar);
         WantDeviceDialogFragment WDDF = new WantDeviceDialogFragment();
         SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDeviceAsked),Context.MODE_PRIVATE);
-        if(!shared.getBoolean(getString(R.string.WantDeviceAsked),false)){
+        if(shared.getBoolean(getString(R.string.WantDeviceAsked),false)){
             WDDF.show(getFragmentManager(),"wantDevice");
         }
 
@@ -41,6 +41,15 @@ public class MainActivity extends ActionBarActivity implements WantDeviceDialogF
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences shared = this.getSharedPreferences(getString(R.string.WantDeviceAsked),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = shared.edit();
+        editor.putBoolean(getString(R.string.WantDeviceAsked),false);
+        Log.d(TAG,"OnDestroy");
     }
 
     @Override
